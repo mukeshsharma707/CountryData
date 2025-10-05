@@ -1,35 +1,65 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from "react";
+import axios from "axios";
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+interface Country {
+  abbr: string;
+  flag: string;
+  name: string;
 }
 
-export default App
+export default function App() {
+  const [data, setData] = useState<Country[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = async () => {
+    const response = await axios.get<Country[]>(
+      "https://xcountries-backend.labs.crio.do/all"
+    );
+    setData(response.data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  if (loading) return <h2 style={{ textAlign: "center" }}>Loading...</h2>;
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "20px",
+        padding: "20px",
+        justifyContent: "center",
+      }}
+    >
+      {data.map((country) => (
+        <div
+          key={country.abbr}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            border: "1px solid black",
+            boxShadow: "0px 0px 5px 0px rgba(0,0,0,0.75)",
+            padding: "10px",
+            borderRadius: "10px",
+            width: "200px",
+            background: "#fff",
+          }}
+        >
+          <img
+            src={country.flag}
+            alt={country.name}
+            style={{ width: "150px", height: "100px", borderRadius: "10px" }}
+          />
+          <div style={{ marginTop: "10px", textAlign: "center" }}>
+            {country.name}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
