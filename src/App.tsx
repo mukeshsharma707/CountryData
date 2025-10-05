@@ -9,14 +9,14 @@ interface Country {
 
 export default function App() {
   const [data, setData] = useState<Country[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [Error,setError] = useState(null);
 
   const fetchData = async () => {
     const response = await axios.get<Country[]>(
       "https://xcountries-backend.labs.crio.do/all"
     );
     setData(response.data);
-    setLoading(false);
+    setError('failed to fetch Countries data');
   };
 
   useEffect(() => {
@@ -35,6 +35,7 @@ export default function App() {
         justifyContent: "center",
       }}
     >
+      {Error && <div style={{color:'red'}}>{Error}</div> }
       {data.map((country) => (
         <div
           key={country.abbr}
